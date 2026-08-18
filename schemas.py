@@ -23,6 +23,16 @@ class UserResponse(UserBase):
     class Config:
         from_attributes = True
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    batch_id: Optional[uuid.UUID] = None
+    mess_id: Optional[uuid.UUID] = None
+    notification_enabled: Optional[bool] = None
+    password: Optional[str] = None
+
 # --- Batches ---
 
 class BatchBase(BaseModel):

@@ -132,6 +132,71 @@ def get_attendance(
 def get_students(current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     return db.query(models.User).filter(models.User.role == "student").all()
 
+# --- Users CRUD ---
+@router.get("/users", response_model=List[schemas.UserResponse])
+def get_users(role: Optional[str] = None, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+    query = db.query(models.User)
+    if role:
+        query = query.filter(models.User.role == role)
+    return query.all()
+
+@router.post("/users", response_model=schemas.UserResponse)
+def create_user(user: schemas.UserCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    hashed_password = auth.get_password_hash(user.password)
+    db_user = models.User(
+        name=user.name,
+        phone=user.phone,
+        email=user.email,
+        hashed_password=hashed_password,
+        role=user.role,
+        batch_id=user.batch_id,
+        mess_id=user.mess_id,
+        notification_enabled=user.notification_enabled
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@router.put("/users/{user_id}", response_model=schemas.UserResponse)
+def update_user(user_id: str, user: schemas.UserUpdate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.name is not None: db_user.name = user.name
+    if user.phone is not None: db_user.phone = user.phone
+    if user.email is not None:
+        # Check if email is being changed and is already in use
+        if user.email != db_user.email:
+            existing = db.query(models.User).filter(models.User.email == user.email).first()
+            if existing:
+                raise HTTPException(status_code=400, detail="Email already registered")
+        db_user.email = user.email
+    if user.role is not None: db_user.role = user.role
+    if user.batch_id is not None: db_user.batch_id = user.batch_id
+    if user.mess_id is not None: db_user.mess_id = user.mess_id
+    if user.notification_enabled is not None: db_user.notification_enabled = user.notification_enabled
+    if user.password is not None:
+        db_user.hashed_password = auth.get_password_hash(user.password)
+        
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+@router.delete("/users/{user_id}")
+def delete_user(user_id: str, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    db.delete(db_user)
+    db.commit()
+    return {"message": "User deleted successfully"}
+
 # --- Batches CRUD ---
 @router.get("/batches", response_model=List[schemas.BatchResponse])
 def get_batches(current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
