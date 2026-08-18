@@ -9,7 +9,7 @@ class Batch(Base):
     __tablename__ = "batches"
     
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String, unique=True, index=True) # e.g., RCD 1
+    name = Column(String(255), unique=True, index=True) # e.g., RCD 1
     
     users = relationship("User", back_populates="batch")
     submissions = relationship("FoodSubmission", back_populates="batch")
@@ -19,8 +19,8 @@ class Mess(Base):
     __tablename__ = "messes"
     
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String, index=True) # Chennai or Karaikudi
-    status = Column(String, default="active") # active, inactive
+    name = Column(String(255), index=True) # Chennai or Karaikudi
+    status = Column(String(255), default="active") # active, inactive
     
     users = relationship("User", back_populates="mess")
     menus = relationship("WeeklyMenu", back_populates="mess")
@@ -31,11 +31,11 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    name = Column(String)
-    phone = Column(String)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    role = Column(String) # student, admin
+    name = Column(String(255))
+    phone = Column(String(255))
+    email = Column(String(255), unique=True, index=True)
+    hashed_password = Column(String(255))
+    role = Column(String(255)) # student, admin
     batch_id = Column(Uuid(as_uuid=True), ForeignKey("batches.id"), nullable=True)
     mess_id = Column(Uuid(as_uuid=True), ForeignKey("messes.id"), nullable=True)
     notification_enabled = Column(Boolean, default=True)
@@ -52,10 +52,10 @@ class WeeklyMenu(Base):
     
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     mess_id = Column(Uuid(as_uuid=True), ForeignKey("messes.id"))
-    day = Column(String) # Monday, Tuesday, etc.
-    breakfast_item = Column(String)
-    lunch_item = Column(String)
-    dinner_item = Column(String)
+    day = Column(String(255)) # Monday, Tuesday, etc.
+    breakfast_item = Column(String(255))
+    lunch_item = Column(String(255))
+    dinner_item = Column(String(255))
     
     mess = relationship("Mess", back_populates="menus")
 
@@ -83,10 +83,10 @@ class FoodSubmission(Base):
 class Attendance(Base):
     __tablename__ = "attendance"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    student_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    student_id = Column(Uuid(as_uuid=True), ForeignKey("users.id"))
     date = Column(Date)
-    status = Column(String) # present, absent, not_submitted
+    status = Column(String(255)) # present, absent, not_submitted
     
     student = relationship("User", back_populates="attendance_records")
 
@@ -94,10 +94,10 @@ class Attendance(Base):
 class PushSubscription(Base):
     __tablename__ = "push_subscriptions"
     
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
-    endpoint = Column(String)
-    p256dh = Column(String)
-    auth = Column(String)
+    id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(Uuid(as_uuid=True), ForeignKey("users.id"))
+    endpoint = Column(String(255))
+    p256dh = Column(String(255))
+    auth = Column(String(255))
     
     user = relationship("User", back_populates="push_subscriptions")
