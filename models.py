@@ -38,7 +38,7 @@ class User(Base):
     role = Column(String(255)) # student, admin
     batch_id = Column(Uuid(as_uuid=True), ForeignKey("batches.id"), nullable=True)
     mess_id = Column(Uuid(as_uuid=True), ForeignKey("messes.id"), nullable=True)
-    notification_enabled = Column(Boolean, default=True)
+    notification_enabled = Column("notification_enable", Boolean, default=True)
     
     batch = relationship("Batch", back_populates="users")
     mess = relationship("Mess", back_populates="users")
