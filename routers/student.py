@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date, datetime
@@ -61,7 +62,7 @@ def create_submission(submission: schemas.FoodSubmissionCreate, current_user: mo
     return db_submission
 
 @router.put("/submissions/{submission_id}", response_model=schemas.FoodSubmissionResponse)
-def edit_submission(submission_id: str, submission_update: schemas.FoodSubmissionUpdate, current_user: models.User = Depends(auth.require_student), db: Session = Depends(get_db)):
+def edit_submission(submission_id: uuid.UUID, submission_update: schemas.FoodSubmissionUpdate, current_user: models.User = Depends(auth.require_student), db: Session = Depends(get_db)):
     db_submission = db.query(models.FoodSubmission).filter(
         models.FoodSubmission.id == submission_id,
         models.FoodSubmission.student_id == current_user.id
@@ -95,5 +96,5 @@ def get_submission_history(current_user: models.User = Depends(auth.require_stud
     ).order_by(models.FoodSubmission.date.desc()).all()
 
 @router.get("/messes/{mess_id}/menu", response_model=list[schemas.WeeklyMenuResponse])
-def get_mess_menu(mess_id: str, current_user: models.User = Depends(auth.require_student), db: Session = Depends(get_db)):
+def get_mess_menu(mess_id: uuid.UUID, current_user: models.User = Depends(auth.require_student), db: Session = Depends(get_db)):
     return db.query(models.WeeklyMenu).filter(models.WeeklyMenu.mess_id == mess_id).all()

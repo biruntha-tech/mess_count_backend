@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -70,8 +71,8 @@ def get_batch_food_count(date_param: date = Query(..., alias="date"), current_us
 @router.get("/students/pending", response_model=List[schemas.UserResponse])
 def get_pending_students(
     date_param: date = Query(..., alias="date"),
-    mess_id: Optional[str] = None,
-    batch_id: Optional[str] = None,
+    mess_id: Optional[uuid.UUID] = None,
+    batch_id: Optional[uuid.UUID] = None,
     current_user: models.User = Depends(auth.require_admin),
     db: Session = Depends(get_db)
 ):
@@ -98,8 +99,8 @@ def get_attendance(
     date_param: Optional[date] = Query(None, alias="date"),
     type: str = "daily", # daily, weekly, monthly
     student_id: Optional[str] = None,
-    batch_id: Optional[str] = None,
-    mess_id: Optional[str] = None,
+    batch_id: Optional[uuid.UUID] = None,
+    mess_id: Optional[uuid.UUID] = None,
     current_user: models.User = Depends(auth.require_admin),
     db: Session = Depends(get_db)
 ):
@@ -163,7 +164,7 @@ def create_user(user: schemas.UserCreate, current_user: models.User = Depends(au
     return db_user
 
 @router.put("/users/{user_id}", response_model=schemas.UserResponse)
-def update_user(user_id: str, user: schemas.UserUpdate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def update_user(user_id: uuid.UUID, user: schemas.UserUpdate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -189,7 +190,7 @@ def update_user(user_id: str, user: schemas.UserUpdate, current_user: models.Use
     return db_user
 
 @router.delete("/users/{user_id}")
-def delete_user(user_id: str, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def delete_user(user_id: uuid.UUID, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -211,7 +212,7 @@ def create_batch(batch: schemas.BatchCreate, current_user: models.User = Depends
     return db_batch
 
 @router.put("/batches/{batch_id}", response_model=schemas.BatchResponse)
-def update_batch(batch_id: str, batch: schemas.BatchCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def update_batch(batch_id: uuid.UUID, batch: schemas.BatchCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
     if not db_batch:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -221,7 +222,7 @@ def update_batch(batch_id: str, batch: schemas.BatchCreate, current_user: models
     return db_batch
 
 @router.delete("/batches/{batch_id}")
-def delete_batch(batch_id: str, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def delete_batch(batch_id: uuid.UUID, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_batch = db.query(models.Batch).filter(models.Batch.id == batch_id).first()
     if not db_batch:
         raise HTTPException(status_code=404, detail="Batch not found")
@@ -243,7 +244,7 @@ def create_mess(mess: schemas.MessCreate, current_user: models.User = Depends(au
     return db_mess
 
 @router.put("/messes/{mess_id}", response_model=schemas.MessResponse)
-def update_mess(mess_id: str, mess: schemas.MessCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def update_mess(mess_id: uuid.UUID, mess: schemas.MessCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_mess = db.query(models.Mess).filter(models.Mess.id == mess_id).first()
     if not db_mess:
         raise HTTPException(status_code=404, detail="Mess not found")
@@ -254,7 +255,7 @@ def update_mess(mess_id: str, mess: schemas.MessCreate, current_user: models.Use
     return db_mess
 
 @router.put("/menu/{menu_row_id}", response_model=schemas.WeeklyMenuResponse)
-def update_menu(menu_row_id: str, menu: schemas.WeeklyMenuCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def update_menu(menu_row_id: uuid.UUID, menu: schemas.WeeklyMenuCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_menu = db.query(models.WeeklyMenu).filter(models.WeeklyMenu.id == menu_row_id).first()
     if not db_menu:
         raise HTTPException(status_code=404, detail="Menu row not found")

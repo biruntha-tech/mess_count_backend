@@ -1,3 +1,4 @@
+import uuid
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 import os
@@ -91,7 +92,7 @@ def remind_pending(date_param: str = Query(..., alias="date"), payload: str = Qu
     return {"message": f"Sent reminder to {count} pending devices"}
 
 @admin_router.post("/remind-batch")
-def remind_batch(batch_id: str, payload: str = Query(..., description="Message to send"), current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def remind_batch(batch_id: uuid.UUID, payload: str = Query(..., description="Message to send"), current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     subscriptions = db.query(models.PushSubscription).join(models.User).filter(
         models.User.batch_id == batch_id,
         models.User.notification_enabled == True
@@ -103,7 +104,7 @@ def remind_batch(batch_id: str, payload: str = Query(..., description="Message t
     return {"message": f"Sent reminder to {count} devices in batch"}
 
 @admin_router.post("/remind-mess")
-def remind_mess(mess_id: str, payload: str = Query(..., description="Message to send"), current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def remind_mess(mess_id: uuid.UUID, payload: str = Query(..., description="Message to send"), current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     subscriptions = db.query(models.PushSubscription).join(models.User).filter(
         models.User.mess_id == mess_id,
         models.User.notification_enabled == True
