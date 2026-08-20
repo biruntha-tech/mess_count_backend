@@ -243,6 +243,20 @@ def create_mess(mess: schemas.MessCreate, current_user: models.User = Depends(au
     db.refresh(db_mess)
     return db_mess
 
+@router.post("/messes/{mess_id}/menu", response_model=schemas.WeeklyMenuResponse)
+def create_menu_row(mess_id: uuid.UUID, menu: schemas.WeeklyMenuCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+    db_menu = models.WeeklyMenu(
+        mess_id=mess_id,
+        day=menu.day,
+        breakfast_item=menu.breakfast_item,
+        lunch_item=menu.lunch_item,
+        dinner_item=menu.dinner_item
+    )
+    db.add(db_menu)
+    db.commit()
+    db.refresh(db_menu)
+    return db_menu
+
 @router.put("/messes/{mess_id}", response_model=schemas.MessResponse)
 def update_mess(mess_id: uuid.UUID, mess: schemas.MessCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_mess = db.query(models.Mess).filter(models.Mess.id == mess_id).first()
@@ -255,13 +269,18 @@ def update_mess(mess_id: uuid.UUID, mess: schemas.MessCreate, current_user: mode
     return db_mess
 
 @router.put("/menu/{menu_row_id}", response_model=schemas.WeeklyMenuResponse)
-def update_menu(menu_row_id: uuid.UUID, menu: schemas.WeeklyMenuCreate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
+def update_menu(menu_row_id: uuid.UUID, menu: schemas.WeeklyMenuUpdate, current_user: models.User = Depends(auth.require_admin), db: Session = Depends(get_db)):
     db_menu = db.query(models.WeeklyMenu).filter(models.WeeklyMenu.id == menu_row_id).first()
     if not db_menu:
         raise HTTPException(status_code=404, detail="Menu row not found")
-    db_menu.breakfast_item = menu.breakfast_item
-    db_menu.lunch_item = menu.lunch_item
-    db_menu.dinner_item = menu.dinner_item
+    if menu.day is not None:
+        db_menu.day = menu.day
+    if menu.breakfast_item is not None:
+        db_menu.breakfast_item = menu.breakfast_item
+    if menu.lunch_item is not None:
+        db_menu.lunch_item = menu.lunch_item
+    if menu.dinner_item is not None:
+        db_menu.dinner_item = menu.dinner_item
     db.commit()
     db.refresh(db_menu)
     return db_menu

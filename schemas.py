@@ -73,6 +73,13 @@ class WeeklyMenuBase(BaseModel):
 class WeeklyMenuCreate(WeeklyMenuBase):
     pass
 
+class WeeklyMenuUpdate(BaseModel):
+    day: Optional[str] = None
+    breakfast_item: Optional[str] = None
+    lunch_item: Optional[str] = None
+    dinner_item: Optional[str] = None
+
+
 class WeeklyMenuResponse(WeeklyMenuBase):
     id: uuid.UUID
     mess_id: uuid.UUID
