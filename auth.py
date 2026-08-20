@@ -47,7 +47,14 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     if token == "hope3":
         admin = db.query(models.User).filter(models.User.role == "admin").first()
         if admin: return admin
-        return models.User(id=uuid.uuid4(), role="admin", name="Master Admin")
+        return models.User(
+            id=uuid.uuid4(), 
+            role="admin", 
+            name="Master Admin",
+            email="admin@foundation.edu",
+            phone="0000000000",
+            notification_enabled=True
+        )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")

@@ -7,8 +7,8 @@ import uuid
 
 class UserBase(BaseModel):
     name: str
-    phone: str
-    email: EmailStr
+    phone: Optional[str] = None
+    email: Optional[EmailStr] = None
     role: str
     batch_id: Optional[uuid.UUID] = None
     mess_id: Optional[uuid.UUID] = None
