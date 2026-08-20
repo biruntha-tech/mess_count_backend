@@ -15,7 +15,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev_secret_key_12345")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 1 week
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 365 * 100 # 100 years
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
