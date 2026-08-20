@@ -96,5 +96,5 @@ def get_submission_history(current_user: models.User = Depends(auth.require_stud
     ).order_by(models.FoodSubmission.date.desc()).all()
 
 @router.get("/messes/{mess_id}/menu", response_model=list[schemas.WeeklyMenuResponse])
-def get_mess_menu(mess_id: uuid.UUID, current_user: models.User = Depends(auth.require_student), db: Session = Depends(get_db)):
+def get_mess_menu(mess_id: uuid.UUID, current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
     return db.query(models.WeeklyMenu).filter(models.WeeklyMenu.mess_id == mess_id).all()
